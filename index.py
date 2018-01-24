@@ -37,8 +37,9 @@ def printer(list, color, legend, output):
             minionStatus += "<button onclick=\"document.getElementById('tr" + minionName + "').style.display = 'block';\" id=\"pressedbutton\">коммент↵</button>\n \
                 </td></tr><tr id=\"tr" + minionName + "\" style=\"display:none;\"><td colspan=\"3\" id=\"comment\">\n \
                 <form action=\"\" method=\"post\"><input type=\"hidden\" name=\"minion\" value=\"" + minionName + "\"/>\n \
-                <input type=\"text\" name=\"comment\" value=\""+ minionComment + "\" size=\"60\"/>\n \
-                <input type=\"submit\"/ value=\"OK\"></form></td></tr>"
+                <input type=\"text\" name=\"comment\" id=\"txt" + minionName + "\"value=\""+ minionComment + "\" size=\"60\"/>\n \
+                <input type=\"button\" onclick=\"document.getElementById('txt" + minionName + "').value = ''\" value=\"X\">\n \
+                <input type=\"submit\"/ value=\"OK\"></form></td></tr>\n"
         output += "<tr><td><p id=\""+color+"\">" + minionName + "</p></td><td><p id=\""+color+"\">" + minionTimestamp + "</p></td><td>" + minionStatus + "</td>"
     return(output)
 
