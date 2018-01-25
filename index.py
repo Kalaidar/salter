@@ -4,7 +4,7 @@ import MySQLdb
 import sys
 import datetime
 import cgi
-
+from subprocess import Popen
 
 def printer(list, color, legend, output):
     for minion in list:
@@ -14,30 +14,30 @@ def printer(list, color, legend, output):
         minionComment = str(minion[3])
         if minionStatus == 'None':
             minionStatus = "<form action=\"\" method=\"post\"><input type=\"hidden\" name=\"minion\" value=\"" + minionName + "\"/><input type=\"hidden\" name=\"status\" value=\"1\" />\n \
-                <input type=\"submit\" id=\"unpressedbutton\" value=\"в пути\" /></form>\n \
+                <input type=\"submit\" id=\"unpressedbutton\" value=\"редко включается\" /></form>\n \
                 <form action=\"\" method=\"post\"><input type=\"hidden\" name=\"minion\" value=\"" + minionName + "\"/><input type=\"hidden\" name=\"status\" value=\"2\" />\n \
                 <input type=\"submit\" id=\"unpressedbutton\" value=\"замена\" /></form>\n"
         if minionStatus == '1':
             minionStatus = "<form action=\"\" method=\"post\"><input type=\"hidden\" name=\"minion\" value=\"" + minionName + "\"/><input type=\"hidden\" name=\"status\" value=\"0\" />\n \
-                <input type=\"submit\" id=\"pressedbutton\" value=\"в пути\" /></form>\n \
+                <input type=\"submit\" id=\"pressedbutton\" value=\"редко включается\" /></form>\n \
                 <form action=\"\" method=\"post\"><input type=\"hidden\" name=\"minion\" value=\"" + minionName + "\"/><input type=\"hidden\" name=\"status\" value=\"2\" />\n \
                 <input type=\"submit\" id=\"unpressedbutton\"  value=\"замена\" /></form>\n"
         if minionStatus == '2':
             minionStatus = "<form action=\"\" method=\"post\"><input type=\"hidden\" name=\"minion\" value=\"" + minionName + "\"/><input type=\"hidden\" name=\"status\" value=\"1\" />\n \
-                <input type=\"submit\" id=\"unpressedbutton\" value=\"в пути\" /></form>\n \
+                <input type=\"submit\" id=\"unpressedbutton\" value=\"редко включается\" /></form>\n \
                 <form action=\"\" method=\"post\"><input type=\"hidden\" name=\"minion\" value=\"" + minionName + "\"/><input type=\"hidden\" name=\"status\" value=\"0\" />\n \
                 <input type=\"submit\" id=\"pressedbutton\" value=\"замена\" /></form>\n"
         if minionComment == 'None':
             minionStatus += "<button onclick=\"document.getElementById('tr" + minionName + "').style.display = 'block';\" id=\"unpressedbutton\">коммент↵</button>\n \
                 </td></tr><tr id=\"tr" + minionName + "\" style=\"display:none;\"><td colspan=\"3\" id=\"comment\">\n \
                 <form action=\"\" method=\"post\"><input type=\"hidden\" name=\"minion\" value=\"" + minionName + "\"/>\n \
-                <input type=\"text\" name=\"comment\" value=\"\" size=\"60\"/>\n \
+                <input type=\"text\" name=\"comment\" value=\"\" size=\"57\"/>\n \
                 <input type=\"submit\"/ value=\"OK\"></form></td></tr>"
         else:
             minionStatus += "<button onclick=\"document.getElementById('tr" + minionName + "').style.display = 'block';\" id=\"pressedbutton\">коммент↵</button>\n \
                 </td></tr><tr id=\"tr" + minionName + "\" style=\"display:none;\"><td colspan=\"3\" id=\"comment\">\n \
                 <form action=\"\" method=\"post\"><input type=\"hidden\" name=\"minion\" value=\"" + minionName + "\"/>\n \
-                <input type=\"text\" name=\"comment\" id=\"txt" + minionName + "\"value=\""+ minionComment + "\" size=\"60\"/>\n \
+                <input type=\"text\" name=\"comment\" id=\"txt" + minionName + "\"value=\""+ minionComment + "\" size=\"57\"/>\n \
                 <input type=\"button\" onclick=\"document.getElementById('txt" + minionName + "').value = ''\" value=\"X\">\n \
                 <input type=\"submit\"/ value=\"OK\"></form></td></tr>\n"
         output += "<tr><td><p id=\""+color+"\">" + minionName + "</p></td><td><p id=\""+color+"\">" + minionTimestamp + "</p></td><td>" + minionStatus + "</td>"
@@ -77,11 +77,12 @@ def application(env, start_response):
             request = "UPDATE minions SET status = '1' WHERE minion_name = '" + postMinion + "'"
         elif postStatus == '2':
             request = "UPDATE minions SET status = '2' WHERE minion_name = '" + postMinion + "'"
+            command = "/usr/bin/sudo /usr/bin/salter-rm " + postMinion
+            output += str(Popen([command], shell=True ,stdin=None, stdout=None, stderr=None, close_fds=True))
         elif postStatus == '0':
             request = "UPDATE minions SET status = NULL WHERE minion_name = '" + postMinion + "'"
 
         history = "INSERT INTO history (minion_name, status, comment) VALUES ('" + postMinion + "', '" + postStatus + "', '" + postComment + "')"
-        output += history
         dbc.execute(history)
         dbc.execute(request)
         db.commit()
