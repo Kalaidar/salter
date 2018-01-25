@@ -67,6 +67,8 @@ def application(env, start_response):
         request = "UPDATE minions SET comment = '" + postComment + "' WHERE minion_name = '" + postMinion + "'"
         if postComment == '':
             request = "UPDATE minions SET comment = NULL WHERE minion_name = '" + postMinion + "'"
+        history = "INSERT INTO history (minion_name, status, comment) VALUES ('" + postMinion + "', '" + postStatus + "', '" + postComment + "')"
+        dbc.execute(history)
         dbc.execute(request)
         db.commit()
         
@@ -77,6 +79,10 @@ def application(env, start_response):
             request = "UPDATE minions SET status = '2' WHERE minion_name = '" + postMinion + "'"
         elif postStatus == '0':
             request = "UPDATE minions SET status = NULL WHERE minion_name = '" + postMinion + "'"
+
+        history = "INSERT INTO history (minion_name, status, comment) VALUES ('" + postMinion + "', '" + postStatus + "', '" + postComment + "')"
+        output += history
+        dbc.execute(history)
         dbc.execute(request)
         db.commit()
 
